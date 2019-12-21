@@ -1,0 +1,1 @@
+export const CATEGORIES = ['Star Wars', 'Famous people', 'Saying', 'Humour', 'Motivational'];
