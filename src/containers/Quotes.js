@@ -3,6 +3,7 @@ import {Button, Card, CardBody, CardText, Col, ListGroup, ListGroupItem, Row} fr
 import {CATEGORIES} from '../constants';
 import {Link, NavLink} from "react-router-dom";
 import axiosApi from "../axios-api";
+import Spinner from "../components/UI/Spinner/Spinner";
 
 
 class Quotes extends Component {
@@ -22,8 +23,6 @@ class Quotes extends Component {
 
     if (response) {
       this.setState({quotes: response.data, loading: false})
-    } else {
-      throw  new Error('Some problems with database!')
     }
   };
   async componentDidMount (){
@@ -43,8 +42,37 @@ class Quotes extends Component {
     this.props.history.push('/');
   };
   render() {
+    let quotes = (Object.keys(this.state.quotes).map(id=>(
+        <Card key={id} style={{margin: '5px'}}>
+          <CardBody>
+            <CardText>
+              "{this.state.quotes[id].text}"
+              <br/>
+              <span><b>-{this.state.quotes[id].author}</b></span>
+            </CardText>
+            <Button size="sm"
+                    tag={Link}
+                    to={`/quotes/${id}/edit/`}
+                    style={{marginRight: '5px'}}
+                    color='primary'
+            >
+              Edit >>
+            </Button>
+            <Button size="sm"
+                    color='danger'
+                    onClick={()=>this.deleteQuote(id)}
+            >Delete
+            </Button>
+          </CardBody>
+        </Card>
+    )));
+
+    if (Object.entries(this.state.quotes).length === 0 ) {
+      quotes = <h1>The are no quotes in this category!</h1>;
+    }
+
     return (
-        <Row>
+        <Row style={{paddingTop: '25px', paddingBottom: '25px'}}>
           <Col xs={4}>
             <ListGroup>
               {CATEGORIES.map(c=>(
@@ -55,31 +83,7 @@ class Quotes extends Component {
             </ListGroup>
           </Col>
           <Col xs={8}>
-            {!this.state.loading &&
-                this.state.quotes && Object.keys(this.state.quotes).map(id=>(
-                <Card key={id} style={{margin: '5px'}}>
-                  <CardBody>
-                    <CardText>
-                      {this.state.quotes[id].text}
-                      <br/>
-                      <span><b>-{this.state.quotes[id].author}</b></span>
-                    </CardText>
-                    <Button size="sm"
-                            tag={Link}
-                            to={`/quotes/${id}/edit/`}
-                            style={{marginRight: '5px'}}
-                            color='primary'
-                    >
-                      Edit >>
-                    </Button>
-                    <Button size="sm"
-                            color='danger'
-                            onClick={()=>this.deleteQuote(id)}
-                    >Delete
-                    </Button>
-                  </CardBody>
-                </Card>
-            ))}
+            {!this.state.loading ? quotes : <Spinner/>}
           </Col>
         </Row>
     );

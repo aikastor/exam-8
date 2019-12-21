@@ -51,7 +51,7 @@ class AddQuote extends Component {
                      value={this.state.text}
                      onChange={this.inputChangeHandler}/>
             </FormGroup>
-            <Button>Submit</Button>
+            <Button color='primary'>Submit</Button>
           </Form>
           {this.state.loading && <Spinner/>}
         </div>
