@@ -1,11 +1,87 @@
 import React, {Component} from 'react';
+import {Button, Card, CardBody, CardText, Col, ListGroup, ListGroupItem, Row} from "reactstrap";
+import {CATEGORIES} from '../constants';
+import {Link, NavLink} from "react-router-dom";
+import axiosApi from "../axios-api";
+
 
 class Quotes extends Component {
+  state = {
+    quotes: [],
+    loading: false,
+  };
+  getData = async ()=> {
+    let url = '/quotes.json';
+
+    if(this.props.match.params.name) {
+      url += `?orderBy="category"&equalTo="${this.props.match.params.name}"`
+    }
+    this.setState({loading: true});
+
+    const response = await axiosApi.get(url);
+
+    if (response) {
+      this.setState({quotes: response.data, loading: false})
+    } else {
+      throw  new Error('Some problems with database!')
+    }
+  };
+  async componentDidMount (){
+    this.getData();
+  };
+  componentDidUpdate(prevProps) {
+    if (this.props.match.params.name !== prevProps.match.params.name) {
+      return this.getData();
+    }
+  }
+  deleteQuote = async (id) =>{
+    console.log(id);
+    this.setState({loading: true});
+
+    await axiosApi.delete(`/quotes/${id}.json`);
+    this.getData();
+    this.props.history.push('/');
+  };
   render() {
     return (
-        <div>
-          
-        </div>
+        <Row>
+          <Col xs={4}>
+            <ListGroup>
+              {CATEGORIES.map(c=>(
+                  <ListGroupItem key={c.id}>
+                    <NavLink to={'/categories/'+ c.id}>{c.title}</NavLink>
+                  </ListGroupItem>
+              ))}
+            </ListGroup>
+          </Col>
+          <Col xs={8}>
+            {!this.state.loading &&
+                this.state.quotes && Object.keys(this.state.quotes).map(id=>(
+                <Card key={id} style={{margin: '5px'}}>
+                  <CardBody>
+                    <CardText>
+                      {this.state.quotes[id].text}
+                      <br/>
+                      <span><b>-{this.state.quotes[id].author}</b></span>
+                    </CardText>
+                    <Button size="sm"
+                            tag={Link}
+                            to={`/quotes/${id}/edit/`}
+                            style={{marginRight: '5px'}}
+                            color='primary'
+                    >
+                      Edit >>
+                    </Button>
+                    <Button size="sm"
+                            color='danger'
+                            onClick={()=>this.deleteQuote(id)}
+                    >Delete
+                    </Button>
+                  </CardBody>
+                </Card>
+            ))}
+          </Col>
+        </Row>
     );
   }
 }

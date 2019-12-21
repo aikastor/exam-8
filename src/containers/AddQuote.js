@@ -9,7 +9,7 @@ class AddQuote extends Component {
   state = {
     author: '',
     text: '',
-    category: CATEGORIES[0],
+    category: CATEGORIES[0].id,
     loading: false,
   };
   inputChangeHandler = e => this.setState({[e.target.name]: e.target.value});
@@ -36,7 +36,7 @@ class AddQuote extends Component {
               <Label for="category">Select category</Label>
               <Input type="select" name="category" id="category" value={this.state.category}
                      onChange={this.inputChangeHandler}>
-                {CATEGORIES.map(c=>(<option key={c} value={c}>{c}</option>))}
+                {CATEGORIES.map(c=>(<option key={c.id} value={c.id}>{c.title}</option>))}
               </Input>
             </FormGroup>
             <FormGroup>
