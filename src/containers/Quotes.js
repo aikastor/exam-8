@@ -34,10 +34,11 @@ class Quotes extends Component {
     }
   }
   deleteQuote = async (id) =>{
-    console.log(id);
+
     this.setState({loading: true});
 
     await axiosApi.delete(`/quotes/${id}.json`);
+
     this.getData();
     this.props.history.push('/');
   };
